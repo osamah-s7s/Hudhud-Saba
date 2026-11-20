@@ -551,6 +551,173 @@
     height: 1px;
     overflow: hidden;
   }
+
+  /* ---------- admin: login ---------- */
+
+  .admin-login-glow {
+    background: radial-gradient(
+      ellipse 60% 42% at 50% 22%,
+      color-mix(in srgb, var(--color-gold) 13%, transparent),
+      transparent 72%
+    );
+  }
+
+  .admin-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--color-muted);
+  }
+
+  .admin-input {
+    display: block;
+    width: 100%;
+    min-height: 3.125rem;
+    padding: 0.7rem 1rem;
+    border: 1px solid var(--color-edge);
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--color-night-deep) 70%, var(--color-night));
+    color: var(--color-sand);
+    font-size: 1.0625rem;
+    line-height: 1.4;
+  }
+  .admin-input:focus-visible {
+    outline-offset: 2px;
+    border-color: var(--color-gold);
+  }
+  .admin-input[aria-invalid="true"] {
+    border-color: var(--color-terracotta);
+  }
+  /* Keep browser autofill on the night palette instead of its pale default. */
+  .admin-input:-webkit-autofill {
+    -webkit-text-fill-color: var(--color-sand);
+    caret-color: var(--color-sand);
+    box-shadow: inset 0 0 0 100px var(--color-night-deep);
+  }
+
+  /* ---------- admin: dashboard ---------- */
+
+  /* Raised surface for KPI tiles, chart cards and notices. */
+  .admin-card {
+    border: 1px solid color-mix(in srgb, var(--color-gold) 30%, var(--color-line));
+    border-radius: 6px;
+    background: var(--color-panel);
+  }
+
+  /* Title band of the results board. */
+  .admin-band {
+    border: 1px solid color-mix(in srgb, var(--color-gold) 45%, transparent);
+    border-radius: 6px;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-charcoal) 80%, var(--color-night)) 0%,
+      color-mix(in srgb, var(--color-earth) 14%, var(--color-night)) 100%
+    );
+  }
+
+  /* Compact pill for a data tool: quieter than .btn-gold / .btn-ghost, still a 44px target. */
+  .admin-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    min-height: 2.75rem;
+    padding: 0 1.15rem;
+    border: 1px solid var(--color-edge);
+    border-radius: 9999px;
+    color: var(--color-sand);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition:
+      border-color 160ms var(--ease-soft),
+      background-color 160ms var(--ease-soft);
+  }
+  @media (hover: hover) {
+    .admin-btn:hover {
+      border-color: var(--color-gold);
+      background-color: color-mix(in srgb, var(--color-gold) 10%, transparent);
+    }
+  }
+  .admin-btn:disabled,
+  .admin-btn[aria-disabled="true"] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .admin-btn-primary {
+    border-color: var(--color-gold-pale);
+    background-color: var(--color-gold);
+    color: var(--color-night);
+  }
+  @media (hover: hover) {
+    .admin-btn-primary:hover {
+      border-color: var(--color-gold-pale);
+      background-color: var(--color-gold-light);
+    }
+  }
+  .admin-btn-quiet {
+    min-height: 2.5rem;
+    padding: 0 0.95rem;
+    border-color: var(--color-line);
+    color: var(--color-gold-pale);
+    font-size: 0.875rem;
+  }
+  .admin-btn-danger {
+    border-color: var(--color-terracotta);
+  }
+  @media (hover: hover) {
+    .admin-btn-danger:hover {
+      border-color: var(--color-terracotta);
+      background-color: color-mix(in srgb, var(--color-burgundy) 55%, transparent);
+    }
+  }
+
+  /* One day's column in the responses-over-time chart. */
+  .admin-column {
+    border-radius: 2px 2px 0 0;
+    background: var(--color-gold);
+  }
+  @media (hover: hover) {
+    .group:hover > .admin-column {
+      background: var(--color-gold-pale);
+    }
+  }
+
+  /* <details> with our own arrow instead of the browser's marker. */
+  .admin-summary {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    list-style: none;
+    cursor: pointer;
+  }
+  .admin-summary::-webkit-details-marker {
+    display: none;
+  }
+  .admin-chevron {
+    color: var(--color-gold-light);
+    transition: transform 160ms var(--ease-soft);
+  }
+  .admin-disclosure[open] > .admin-summary .admin-chevron {
+    transform: rotate(90deg);
+  }
+  .admin-row-summary {
+    gap: 1rem;
+    min-height: 3.25rem;
+    padding: 0.75rem 0.25rem;
+    font-size: 0.9375rem;
+    line-height: 1.35;
+  }
+  @media (hover: hover) {
+    .admin-row-summary:hover {
+      background-color: color-mix(in srgb, var(--color-gold) 6%, transparent);
+    }
+  }
 }
 
 @keyframes step-in {

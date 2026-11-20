@@ -1,14 +1,20 @@
 import { validateAnswers, type Answers, type SubmitResponse } from "@/lib/answers";
 import { buildSurveyEmail, cleanAnswers, getEmailConfig, sendSurveyEmail } from "@/lib/email";
 import { clientIp, createRateLimiter } from "@/lib/rate-limit";
+import { missingSupabaseEnv, saveResponse } from "@/lib/responses";
 
 /*
- * POST /api/submit — receives one survey response and emails it.
+ * POST /api/submit — receives one survey response and stores it.
+ *
+ * The response is saved to Supabase first; that row is the source of truth
+ * (the admin panel at /admin reads it). Email is an optional extra copy: when
+ * SMTP is configured the response is also emailed, but a missing SMTP setup
+ * or a failed send never fails a request whose row is already saved.
  *
  * Runtime: this app has `cacheComponents: true`, and in this Next.js version
  * Cache Components only runs on the Node.js runtime and does not allow a
  * `runtime` segment export (not even `runtime = 'nodejs'`). Node.js is the
- * default, so nodemailer works here without any export. A POST handler is
+ * default, so nodemailer and the Supabase client work here without any export. A POST handler is
  * never prerendered or cached, so the route is always a request-time
  * function. Only POST is exported; Next.js answers other methods with 405.
  */
@@ -63,13 +69,18 @@ async function readBodyLimited(request: Request, limit: number): Promise<string 
   }
 }
 
-function isTooFast(startedAt: unknown, now: number): boolean {
-  if (typeof startedAt !== "number" || !Number.isFinite(startedAt)) return false;
+/** Milliseconds since the visitor pressed Begin, or null when `startedAt` is not sane. */
+function saneElapsedMs(startedAt: unknown, now: number): number | null {
+  if (typeof startedAt !== "number" || !Number.isFinite(startedAt)) return null;
   const elapsed = now - startedAt;
   // Negative or very old values (bad client clock, stale tab) are not sane:
   // ignore them rather than risk dropping a real response.
-  if (elapsed < 0 || elapsed > MAX_STARTED_AGE_MS) return false;
-  return elapsed < MIN_FILL_MS;
+  if (elapsed < 0 || elapsed > MAX_STARTED_AGE_MS) return null;
+  return elapsed;
+}
+
+function isTooFast(elapsedMs: number | null): boolean {
+  return elapsedMs !== null && elapsedMs < MIN_FILL_MS;
 }
 
 export async function POST(request: Request) {
@@ -97,12 +108,13 @@ export async function POST(request: Request) {
   }
   const { answers, website, startedAt } = payload as Record<string, unknown>;
 
-  // Spam checks: answer "ok" so bots learn nothing, but send nothing.
+  // Spam checks: answer "ok" so bots learn nothing, but store and send nothing.
   if (typeof website === "string" && website.trim() !== "") {
     console.info("[submit] dropped: honeypot filled");
     return json({ ok: true }, 200);
   }
-  if (isTooFast(startedAt, Date.now())) {
+  const elapsedMs = saneElapsedMs(startedAt, Date.now());
+  if (isTooFast(elapsedMs)) {
     console.info("[submit] dropped: submitted too quickly");
     return json({ ok: true }, 200);
   }
@@ -112,22 +124,40 @@ export async function POST(request: Request) {
     return json({ ok: false, error: "validation", fields: validation.fields }, 400);
   }
 
-  const configResult = getEmailConfig();
-  if (!configResult.ok) {
-    console.error(
-      `[submit] email not configured; missing or invalid env vars: ${configResult.problems.join(", ")}`,
-    );
+  const missing = missingSupabaseEnv();
+  if (missing.length > 0) {
+    console.error(`[submit] storage not configured; missing env vars: ${missing.join(", ")}`);
     return json({ ok: false, error: "not_configured" }, 503);
   }
 
-  const email = buildSurveyEmail(cleanAnswers(answers as Answers));
+  const cleaned = cleanAnswers(answers as Answers);
+  // Whole seconds; null when the client clock gave nothing usable. Bounded by
+  // MAX_STARTED_AGE_MS, so it always fits the integer column.
+  const durationSeconds = elapsedMs === null ? null : Math.round(elapsedMs / 1000);
+
   try {
-    // Awaited: a serverless function may be frozen once the response is sent.
-    await sendSurveyEmail(configResult.config, email);
+    await saveResponse(cleaned, durationSeconds);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error(`[submit] send failed: ${message}`);
+    console.error(`[submit] save failed: ${message}`);
     return json({ ok: false, error: "send_failed" }, 502);
+  }
+
+  // From here on the response is safely stored: nothing below may fail the request.
+  const configResult = getEmailConfig();
+  if (!configResult.ok) {
+    console.info(
+      `[submit] saved; email copy skipped, SMTP not configured (missing or invalid: ${configResult.problems.join(", ")})`,
+    );
+    return json({ ok: true }, 200);
+  }
+
+  try {
+    // Awaited: a serverless function may be frozen once the response is sent.
+    await sendSurveyEmail(configResult.config, buildSurveyEmail(cleaned));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.warn(`[submit] saved, but the email copy failed: ${message}`);
   }
 
   return json({ ok: true }, 200);
