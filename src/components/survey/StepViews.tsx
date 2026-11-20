@@ -270,7 +270,7 @@ export function SendStep({
                   onClick={() => onJump(q.id)}
                   className="flex min-h-11 w-full touch-manipulation items-center gap-3 rounded-[4px] border border-line px-4 py-2 text-left text-[0.9375rem] text-sand transition-colors hover:border-gold"
                 >
-                  <span className="flex-none font-semibold text-gold-light">{t.goTo(q.number)}</span>
+                  <span className="max-w-full flex-none font-semibold text-gold-light">{t.goTo(q.number)}</span>
                   <span className="min-w-0 truncate text-muted">{q.prompt}</span>
                 </button>
               </li>
