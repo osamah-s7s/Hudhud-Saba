@@ -26,7 +26,7 @@ export function Questionnaire() {
 
         <ul
           aria-label={q.sectionsLabel}
-          className="mt-11 grid overflow-hidden rounded-[6px] border border-gold/45 text-left sm:grid-cols-2"
+          className="mt-11 grid grid-cols-1 overflow-hidden rounded-[6px] border border-gold/45 text-left sm:grid-cols-2"
         >
           {sections.map((s, i) => (
             <li

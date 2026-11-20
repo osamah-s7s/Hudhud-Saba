@@ -500,11 +500,17 @@ export const ui = {
     submit: "Send my answers",
     sending: "Sending…",
     tryAgain: "Try again",
+    loading: "Opening the questionnaire…",
+    loadFailed:
+      "The questionnaire could not be opened. Please check your connection and try again — your answers are saved.",
+    reload: "Try again",
     errors: {
       rate_limited:
         "Several responses have just been sent from this connection. Please wait a few minutes and try again — your answers are saved.",
       validation:
         "Some answers could not be accepted. Please check them and send again — nothing has been lost.",
+      server:
+        "The survey cannot accept responses at the moment. Please try again a little later — your answers are saved.",
       generic:
         "Your answers could not be sent just now. Please check your connection and try again — nothing has been lost.",
     },

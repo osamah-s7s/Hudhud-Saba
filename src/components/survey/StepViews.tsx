@@ -219,7 +219,7 @@ export function SectionCard({
 export type SubmitState =
   | { status: "idle" }
   | { status: "sending" }
-  | { status: "error"; kind: "rate_limited" | "validation" | "generic" };
+  | { status: "error"; kind: "rate_limited" | "validation" | "server" | "generic" };
 
 export function SendStep({
   answers,
@@ -270,7 +270,7 @@ export function SendStep({
                   onClick={() => onJump(q.id)}
                   className="flex min-h-11 w-full touch-manipulation items-center gap-3 rounded-[4px] border border-line px-4 py-2 text-left text-[0.9375rem] text-sand transition-colors hover:border-gold"
                 >
-                  <span className="flex-none font-semibold text-gold-light">{t.goTo(q.number)}</span>
+                  <span className="max-w-full flex-none font-semibold text-gold-light">{t.goTo(q.number)}</span>
                   <span className="min-w-0 truncate text-muted">{q.prompt}</span>
                 </button>
               </li>
@@ -296,6 +296,11 @@ export function SendStep({
             name="website"
             tabIndex={-1}
             autoComplete="off"
+            // Ask password managers and form fillers to leave this field alone.
+            data-1p-ignore
+            data-lpignore="true"
+            data-bwignore
+            data-form-type="other"
             value={honeypot}
             onChange={(e) => onHoneypot(e.target.value)}
           />

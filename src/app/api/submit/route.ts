@@ -14,13 +14,38 @@ import { clientIp, createRateLimiter } from "@/lib/rate-limit";
  */
 
 const MAX_BODY_BYTES = 20 * 1024;
-/** Submissions faster than this after pressing Begin are treated as bots. */
-const MIN_FILL_MS = 3_000;
-/** Accept startedAt only within this age; anything else is ignored, never blocked. */
-const MAX_STARTED_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 
 // Best-effort, per-instance (see src/lib/rate-limit.ts for the limitation).
-const rateLimit = createRateLimiter({ limit: 5, windowMs: 10 * 60 * 1000, maxKeys: 5_000 });
+// The limit is generous on purpose: a whole class answering from one campus
+// network shares a single public IP address.
+const rateLimit = createRateLimiter({ limit: 30, windowMs: 10 * 60 * 1000, maxKeys: 5_000 });
+
+/**
+ * Ids of responses already emailed by this instance, so a retry after a
+ * dropped connection does not email the same response twice. Best-effort,
+ * like the rate limit; the id is also printed in the email so any duplicate
+ * that slips through can be spotted.
+ */
+const SENT_TTL_MS = 60 * 60 * 1000;
+const SENT_MAX = 2_000;
+const sentIds = new Map<string, number>();
+
+function alreadySent(id: string, now: number): boolean {
+  const at = sentIds.get(id);
+  return at !== undefined && at > now - SENT_TTL_MS;
+}
+
+function rememberSent(id: string, now: number) {
+  sentIds.set(id, now);
+  if (sentIds.size <= SENT_MAX) return;
+  for (const [key, at] of sentIds) {
+    if (at <= now - SENT_TTL_MS || sentIds.size > SENT_MAX) sentIds.delete(key);
+    else break;
+  }
+}
+
+const isSubmissionId = (value: unknown): value is string =>
+  typeof value === "string" && /^[A-Za-z0-9-]{8,64}$/.test(value);
 
 function json(body: SubmitResponse, status: number, headers: Record<string, string> = {}) {
   return Response.json(body, {
@@ -63,23 +88,7 @@ async function readBodyLimited(request: Request, limit: number): Promise<string 
   }
 }
 
-function isTooFast(startedAt: unknown, now: number): boolean {
-  if (typeof startedAt !== "number" || !Number.isFinite(startedAt)) return false;
-  const elapsed = now - startedAt;
-  // Negative or very old values (bad client clock, stale tab) are not sane:
-  // ignore them rather than risk dropping a real response.
-  if (elapsed < 0 || elapsed > MAX_STARTED_AGE_MS) return false;
-  return elapsed < MIN_FILL_MS;
-}
-
 export async function POST(request: Request) {
-  const limited = rateLimit(clientIp(request.headers));
-  if (!limited.allowed) {
-    return json({ ok: false, error: "rate_limited" }, 429, {
-      "Retry-After": String(limited.retryAfterSeconds),
-    });
-  }
-
   const contentType = request.headers.get("content-type") ?? "";
   if (!/^application\/json\s*(;|$)/i.test(contentType)) return badRequest();
 
@@ -95,15 +104,11 @@ export async function POST(request: Request) {
   if (typeof payload !== "object" || payload === null || Array.isArray(payload)) {
     return badRequest();
   }
-  const { answers, website, startedAt } = payload as Record<string, unknown>;
+  const { answers, website, submissionId } = payload as Record<string, unknown>;
 
   // Spam checks: answer "ok" so bots learn nothing, but send nothing.
   if (typeof website === "string" && website.trim() !== "") {
     console.info("[submit] dropped: honeypot filled");
-    return json({ ok: true }, 200);
-  }
-  if (isTooFast(startedAt, Date.now())) {
-    console.info("[submit] dropped: submitted too quickly");
     return json({ ok: true }, 200);
   }
 
@@ -120,7 +125,22 @@ export async function POST(request: Request) {
     return json({ ok: false, error: "not_configured" }, 503);
   }
 
-  const email = buildSurveyEmail(cleanAnswers(answers as Answers));
+  const responseId = isSubmissionId(submissionId) ? submissionId : null;
+  if (responseId && alreadySent(responseId, Date.now())) {
+    // A retry of a response that was already emailed: report success, send nothing.
+    return json({ ok: true }, 200);
+  }
+
+  // Only requests that would actually send an email count against the limit,
+  // so malformed or rejected attempts never lock a real visitor out.
+  const limited = rateLimit(clientIp(request.headers));
+  if (!limited.allowed) {
+    return json({ ok: false, error: "rate_limited" }, 429, {
+      "Retry-After": String(limited.retryAfterSeconds),
+    });
+  }
+
+  const email = buildSurveyEmail(cleanAnswers(answers as Answers), new Date(), responseId);
   try {
     // Awaited: a serverless function may be frozen once the response is sent.
     await sendSurveyEmail(configResult.config, email);
@@ -130,5 +150,6 @@ export async function POST(request: Request) {
     return json({ ok: false, error: "send_failed" }, 502);
   }
 
+  if (responseId) rememberSent(responseId, Date.now());
   return json({ ok: true }, 200);
 }

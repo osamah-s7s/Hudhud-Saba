@@ -8,8 +8,11 @@ export interface SubmitPayload {
   answers: Answers;
   /** Honeypot. Real visitors never see or fill this field. */
   website: string;
-  /** Epoch ms when the visitor pressed Begin. */
-  startedAt: number;
+  /**
+   * Random id created once when the visitor presses Begin. Lets the server
+   * ignore a retry of a response it has already emailed.
+   */
+  submissionId: string;
 }
 
 export type SubmitResponse =

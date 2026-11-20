@@ -12,7 +12,8 @@ const requiredMessage = (kind: string) =>
 
 /** Is this keydown an "Enter to continue" (and not Enter meant for something else)? */
 function isAdvanceKey(e: KeyboardEvent): boolean {
-  if (e.key !== "Enter" || e.isComposing || e.defaultPrevented) return false;
+  // e.repeat: a held Enter must not run through several steps.
+  if (e.key !== "Enter" || e.repeat || e.isComposing || e.defaultPrevented) return false;
   if (e.shiftKey || e.altKey || e.ctrlKey || e.metaKey) return false;
   const t = e.target as HTMLElement | null;
   if (!t) return true;
@@ -28,7 +29,7 @@ function TopBar({ step, answered }: { step: Step; answered: number }) {
     <header className="border-b border-transparent bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-night-deep)_70%,transparent),transparent)]">
       <h1 className="sr-only">{site.name}</h1>
       <div className="mx-auto max-w-[64rem]">
-        <div className="flex min-h-14 items-center justify-between gap-4 px-5">
+        <div className="flex min-h-14 items-center justify-between gap-x-4 px-5 max-[19.5rem]:flex-wrap max-[19.5rem]:py-2">
           <p className="flex min-w-0 items-baseline gap-2 text-sm text-muted">
             {section ? (
               <>
@@ -39,7 +40,7 @@ function TopBar({ step, answered }: { step: Step; answered: number }) {
                 <span aria-hidden="true" className="text-subtle">
                   /
                 </span>
-                <span className="leading-snug text-sand/90">{section.title}</span>
+                <span className="min-w-0 leading-snug wrap-break-word text-sand/90">{section.title}</span>
               </>
             ) : (
               <span className="text-sand/90">{ui.send.crumb}</span>
@@ -70,7 +71,7 @@ function TopBar({ step, answered }: { step: Step; answered: number }) {
 }
 
 export default function Stepper() {
-  const { phase, stepId, answers, startedAt } = useSurvey();
+  const { phase, stepId, answers, submissionId } = useSurvey();
   const index = stepIndex(stepId);
   const step = steps[index];
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -137,7 +138,7 @@ export default function Stepper() {
       return;
     }
     setSubmit({ status: "sending" });
-    const payload: SubmitPayload = { answers, website: honeypot, startedAt: startedAt ?? Date.now() };
+    const payload: SubmitPayload = { answers, website: honeypot, submissionId: submissionId ?? "" };
     try {
       const res = await fetch("/api/submit", {
         method: "POST",
@@ -168,8 +169,10 @@ export default function Stepper() {
         setSubmit({ status: "error", kind: "validation" });
         return;
       }
-      setSubmit({ status: "error", kind: "generic" });
+      // The server answered but could not accept the response (5xx, not configured…).
+      setSubmit({ status: "error", kind: "server" });
     } catch {
+      // No answer at all: offline, or the connection dropped.
       setSubmit({ status: "error", kind: "generic" });
     }
   };

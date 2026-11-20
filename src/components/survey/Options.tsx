@@ -60,7 +60,9 @@ export function Options({ question, value, onChange, labelledBy, describedBy, in
     >
       {pictureOptions.length > 0 ? (
         <div
-          className={`grid grid-cols-2 gap-3 sm:gap-4 ${threeUp ? "md:grid-cols-3" : ""}`}
+          // One column only when large browser text leaves under ~19.5rem of width
+          // (e.g. 200% text on a phone); never at default text size.
+          className={`grid grid-cols-2 gap-3 max-[19.5rem]:grid-cols-1 sm:gap-4 ${threeUp ? "md:grid-cols-3" : ""}`}
         >
           {pictureOptions.map((o) => {
             const selected = selectedIds.includes(o.id);
