@@ -28,7 +28,7 @@ function TopBar({ step, answered }: { step: Step; answered: number }) {
     <header className="border-b border-transparent bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-night-deep)_70%,transparent),transparent)]">
       <h1 className="sr-only">{site.name}</h1>
       <div className="mx-auto max-w-[64rem]">
-        <div className="flex min-h-14 items-center justify-between gap-4 px-5">
+        <div className="flex min-h-14 items-center justify-between gap-x-4 px-5 max-[19.5rem]:flex-wrap max-[19.5rem]:py-2">
           <p className="flex min-w-0 items-baseline gap-2 text-sm text-muted">
             {section ? (
               <>
@@ -39,7 +39,7 @@ function TopBar({ step, answered }: { step: Step; answered: number }) {
                 <span aria-hidden="true" className="text-subtle">
                   /
                 </span>
-                <span className="leading-snug text-sand/90">{section.title}</span>
+                <span className="min-w-0 leading-snug wrap-break-word text-sand/90">{section.title}</span>
               </>
             ) : (
               <span className="text-sand/90">{ui.send.crumb}</span>

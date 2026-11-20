@@ -1,4 +1,7 @@
 import Image from "next/image";
+// Static import: the URL carries a content hash, so replacing the file never
+// serves a stale optimised copy from the image cache.
+import heroImage from "../../../public/hero.png";
 import { heroPins, site, ui } from "@/data/survey";
 import { Hoopoe } from "@/components/icons";
 
@@ -66,7 +69,7 @@ function JourneyTicket() {
       <p className="sr-only">
         {journey.fromLabel} {journey.from} {journey.toLabel.toLowerCase()} {journey.to}
       </p>
-      <div aria-hidden="true" className="flex items-end justify-between gap-2">
+      <div aria-hidden="true" className="flex flex-wrap items-end justify-between gap-2">
         <div className="text-left">
           <span className="block text-[0.625rem] font-bold uppercase tracking-[0.28em] text-gold-light">
             {journey.fromLabel}
@@ -95,7 +98,7 @@ function JourneyTicket() {
             <Hoopoe className="h-7 w-auto sm:h-8" />
           </span>
         </div>
-        <div className="text-right">
+        <div className="ml-auto text-right">
           <span className="block text-[0.625rem] font-bold uppercase tracking-[0.28em] text-gold-light">
             {journey.toLabel}
           </span>
@@ -113,7 +116,7 @@ export function Hero() {
     <header className="relative overflow-x-clip">
       <div className="hero-frame">
         <Image
-          src="/hero.png"
+          src={heroImage}
           alt={ui.heroAlt}
           fill
           preload
@@ -125,7 +128,7 @@ export function Hero() {
       </div>
 
       <div className="relative z-10 -mt-12 px-4 text-center md:-mt-[9.9vw]">
-        <p className="kicker text-[0.6875rem] tracking-[0.38em] sm:text-xs sm:tracking-[0.42em]">
+        <p className="kicker [text-shadow:0_0_3px_var(--color-night),0_0_12px_var(--color-night)] text-[0.6875rem] tracking-[0.38em] sm:text-xs sm:tracking-[0.42em]">
           {site.kicker}
         </p>
         <p
