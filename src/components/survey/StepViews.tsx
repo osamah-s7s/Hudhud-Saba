@@ -219,7 +219,7 @@ export function SectionCard({
 export type SubmitState =
   | { status: "idle" }
   | { status: "sending" }
-  | { status: "error"; kind: "rate_limited" | "validation" | "generic" };
+  | { status: "error"; kind: "rate_limited" | "validation" | "server" | "generic" };
 
 export function SendStep({
   answers,
@@ -296,6 +296,11 @@ export function SendStep({
             name="website"
             tabIndex={-1}
             autoComplete="off"
+            // Ask password managers and form fillers to leave this field alone.
+            data-1p-ignore
+            data-lpignore="true"
+            data-bwignore
+            data-form-type="other"
             value={honeypot}
             onChange={(e) => onHoneypot(e.target.value)}
           />

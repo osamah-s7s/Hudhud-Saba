@@ -19,6 +19,8 @@ export interface SurveyState {
   stepId: string;
   answers: Answers;
   startedAt: number | null;
+  /** Random id for this response; lets the server ignore a repeated send. */
+  submissionId: string | null;
 }
 
 interface Persisted {
@@ -28,6 +30,16 @@ interface Persisted {
   stepId: string;
   answers: Answers;
   startedAt: number | null;
+  submissionId?: string | null;
+}
+
+function newSubmissionId(): string {
+  try {
+    return crypto.randomUUID();
+  } catch {
+    // Older browsers / non-secure contexts.
+    return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`;
+  }
 }
 
 const initialState: SurveyState = {
@@ -35,6 +47,7 @@ const initialState: SurveyState = {
   stepId: firstStepId,
   answers: {},
   startedAt: null,
+  submissionId: null,
 };
 
 let state: SurveyState = initialState;
@@ -55,6 +68,10 @@ function readStorage(): SurveyState | null {
         typeof data.startedAt === "number" && Number.isFinite(data.startedAt)
           ? data.startedAt
           : Date.now(),
+      submissionId:
+        typeof data.submissionId === "string" && /^[A-Za-z0-9-]{8,64}$/.test(data.submissionId)
+          ? data.submissionId
+          : newSubmissionId(),
     };
   } catch {
     return null;
@@ -71,6 +88,7 @@ function writeStorage(s: SurveyState) {
         stepId: s.stepId,
         answers: s.answers,
         startedAt: s.startedAt,
+        submissionId: s.submissionId,
       };
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     } else {
@@ -122,6 +140,7 @@ export const survey = {
       ...state,
       phase: "survey",
       startedAt: state.startedAt ?? Date.now(),
+      submissionId: state.submissionId ?? newSubmissionId(),
     });
   },
   /** Leave the stepper for the intro; answers stay saved. */
@@ -143,6 +162,12 @@ export const survey = {
   },
   /** After a successful send: show thanks and forget everything saved. */
   finish() {
-    setState({ phase: "done", stepId: firstStepId, answers: {}, startedAt: null });
+    setState({
+      phase: "done",
+      stepId: firstStepId,
+      answers: {},
+      startedAt: null,
+      submissionId: null,
+    });
   },
 };

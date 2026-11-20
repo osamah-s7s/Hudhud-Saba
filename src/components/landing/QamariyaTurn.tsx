@@ -21,6 +21,7 @@ export function QamariyaTurn({ children }: { children: React.ReactNode }) {
 
     let frame = 0;
     let listening = false;
+    let visible = false;
 
     const update = () => {
       frame = 0;
@@ -51,7 +52,11 @@ export function QamariyaTurn({ children }: { children: React.ReactNode }) {
     };
 
     const observer = new IntersectionObserver(
-      ([entry]) => (entry.isIntersecting ? start() : stop()),
+      ([entry]) => {
+        visible = entry.isIntersecting;
+        if (visible) start();
+        else stop();
+      },
       { rootMargin: "100px 0px" },
     );
     observer.observe(el);
@@ -60,7 +65,7 @@ export function QamariyaTurn({ children }: { children: React.ReactNode }) {
       if (motion.matches) {
         stop();
         el.style.removeProperty("--turn");
-      } else {
+      } else if (visible) {
         start();
       }
     };

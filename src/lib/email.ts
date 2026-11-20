@@ -133,15 +133,28 @@ export interface SurveyEmail {
  * promises respondents anonymity). Visitor text only ever goes in the body,
  * HTML-escaped, never in a header.
  */
-export function buildSurveyEmail(answers: Answers, submittedAt = new Date()): SurveyEmail {
+export function buildSurveyEmail(
+  answers: Answers,
+  submittedAt = new Date(),
+  /** Random per-response id (not personal data); two emails with the same id are one response. */
+  responseId: string | null = null,
+): SurveyEmail {
   const iso = submittedAt.toISOString();
   const subject = `Hudhud Saba survey response — ${iso}`;
 
-  const textLines: string[] = [`Hudhud Saba survey response`, `Submitted: ${iso}`, ""];
+  const idLine = responseId ? `Response ID: ${responseId}` : null;
+  const textLines: string[] = [
+    `Hudhud Saba survey response`,
+    `Submitted: ${iso}`,
+    ...(idLine ? [idLine] : []),
+    "",
+  ];
   const htmlParts: string[] = [
     `<div style="font-family:Georgia,'Times New Roman',serif;color:#34302C;max-width:640px">`,
     `<h1 style="font-size:20px;color:#713B2E;margin:0 0 4px">Hudhud Saba survey response</h1>`,
-    `<p style="margin:0 0 16px;color:#68734B;font-size:13px">Submitted: ${escapeHtml(iso)}</p>`,
+    `<p style="margin:0 0 16px;color:#68734B;font-size:13px">Submitted: ${escapeHtml(iso)}${
+      idLine ? `<br>${escapeHtml(idLine)}` : ""
+    }</p>`,
   ];
 
   for (const section of sections) {

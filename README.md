@@ -44,25 +44,31 @@ variables.
 
 ## How a response is sent (`/api/submit`)
 
-1. **Rate limit** — at most 5 submissions per client IP per 10 minutes
-   (HTTP 429 with a `Retry-After` header).
-2. **Request checks** — only `POST` with `Content-Type: application/json` and a
+1. **Request checks** — only `POST` with `Content-Type: application/json` and a
    body under 20 KB is accepted (otherwise 400 / 405).
-3. **Spam checks** — a hidden "website" field (honeypot) that people never see,
-   and a check that the form was not submitted less than 3 seconds after
-   pressing Begin. Either one makes the server reply "ok" without sending
-   anything, so bots get no signal.
-4. **Validation** — the server re-validates every answer with the same rules
+2. **Spam check** — a hidden "website" field (honeypot) that people never see.
+   If it is filled, the server replies "ok" without sending anything, so bots
+   get no signal.
+3. **Validation** — the server re-validates every answer with the same rules
    as the browser (`validateAnswers` in `src/lib/answers.ts`): unknown
    questions, unknown options, wrong types, over-long text and the
    "Nothing would prevent me" exclusivity rule are all rejected (400 with the
    question ids).
-5. **Email** — answers are grouped by section with question numbers and the
+4. **Duplicate check** — each response carries a random id created when the
+   visitor presses Begin. If the same id was already emailed (a retry after a
+   dropped connection), the server replies "ok" and sends nothing. The id is
+   also printed in the email as "Response ID", so a duplicate that slips
+   through can be spotted. It identifies the response, not the person.
+5. **Rate limit** — at most 30 emailed responses per client IP per 10 minutes
+   (HTTP 429 with a `Retry-After` header). The limit is generous because a
+   whole class on one campus network shares one public IP address. Only
+   requests that would send an email are counted.
+6. **Email** — answers are grouped by section with question numbers and the
    readable option labels. The free-text answer is trimmed, stripped of
    control characters and HTML-escaped, and only ever appears in the body.
    The email contains no IP address or other personal data.
 
-**Limitation of the rate limit (be aware):** it lives in the memory of each
+**Limitation of the rate limit and the duplicate check (be aware):** they live in the memory of each
 serverless function instance. On Vercel that means it is per instance, is not
 shared between instances, and resets on cold starts and redeploys. It is basic,
 best-effort protection only. For stronger protection, add a rate-limit rule
