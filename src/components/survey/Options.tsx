@@ -90,7 +90,9 @@ export function Options({ question, value, onChange, labelledBy, describedBy, in
                 </span>
                 <span className="opt-card-label">
                   {marker(selected)}
-                  <span id={`${o.id}-label`}>{o.label}</span>
+                  <span id={`${o.id}-label`} className="min-w-0 wrap-break-word">
+                    {o.label}
+                  </span>
                 </span>
               </label>
             );
@@ -106,7 +108,7 @@ export function Options({ question, value, onChange, labelledBy, describedBy, in
               <label key={o.id} className="opt-row" data-selected={selected}>
                 {input(o)}
                 {marker(selected)}
-                <span>{o.label}</span>
+                <span className="min-w-0 wrap-break-word">{o.label}</span>
               </label>
             );
           })}

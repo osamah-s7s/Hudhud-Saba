@@ -13,7 +13,7 @@ export function BeginButton() {
       <button
         id="begin"
         type="button"
-        className="btn-gold min-h-[3.375rem] min-w-[14rem] px-10 text-[1.1875rem] tracking-[0.03em] sm:min-w-[16rem]"
+        className="btn-gold min-h-[3.375rem] min-w-[min(14rem,100%)] px-10 text-[1.1875rem] tracking-[0.03em] sm:min-w-[min(16rem,100%)]"
         onPointerEnter={preloadStepper}
         onFocus={preloadStepper}
         onClick={() => survey.start()}

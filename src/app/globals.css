@@ -471,6 +471,10 @@
       0 0 0 5px var(--color-gold-pale),
       0 8px 34px -4px color-mix(in srgb, var(--color-gold) 70%, transparent);
   }
+  /* The selection ring above sits 3–5px out; move the focus ring clear of it so focus stays visible. */
+  .opt-card[data-selected="true"][data-kind="single"]:has(input:focus-visible) {
+    outline-offset: 7px;
+  }
   .opt-card[data-selected="true"] .opt-card-label {
     background: linear-gradient(
       180deg,

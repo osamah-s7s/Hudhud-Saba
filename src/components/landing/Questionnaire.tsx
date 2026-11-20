@@ -41,7 +41,7 @@ export function Questionnaire() {
               >
                 {s.id}
               </span>
-              <span className="min-w-0">
+              <span className="min-w-0 wrap-break-word">
                 <span className="sr-only">
                   {ui.stepper.section} {s.id}:{" "}
                 </span>

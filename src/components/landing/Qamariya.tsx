@@ -36,7 +36,7 @@ export function Qamariya() {
       </QamariyaTurn>
 
       <div className="mx-auto mt-[clamp(7rem,14vw,10rem)] max-w-xl text-center">
-        <p className="kicker flex items-center justify-center gap-3">
+        <p className="kicker flex flex-wrap items-center justify-center gap-3">
           <span lang="ar" dir="rtl" className="font-arabic text-lg tracking-normal normal-case">
             {qamariya.arabic}
           </span>

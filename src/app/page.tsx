@@ -12,7 +12,7 @@ export default function Home() {
         <>
           <a
             href="#questionnaire"
-            className="sr-only z-50 rounded-full bg-sand px-5 py-3 font-semibold text-night focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+            className="sr-only z-50 rounded-full bg-sand px-5 py-3 font-semibold text-night focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:px-5 focus:py-3"
           >
             {ui.skipLink}
           </a>

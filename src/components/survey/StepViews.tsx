@@ -25,12 +25,12 @@ export function StepNav({
 }) {
   const s = ui.stepper;
   return (
-    <div className="mt-12 flex items-center justify-between gap-4">
+    <div className="mt-12 flex flex-wrap items-center justify-between gap-4">
       <button type="button" className="btn-ghost" onClick={onBack}>
         <ArrowLeft />
         {s.back}
       </button>
-      <div className="flex items-center gap-4">
+      <div className="ml-auto flex items-center gap-4">
         {showEnterHint ? (
           <span aria-hidden="true" className="kbd-hint text-sm text-muted">
             {s.orPress} <kbd className="kbd-chip">{s.enter}</kbd>
@@ -165,6 +165,10 @@ function TextAnswer({
         aria-describedby={describedBy}
         maxLength={max}
         rows={6}
+        autoComplete="off"
+        autoCapitalize="sentences"
+        spellCheck
+        enterKeyHint="enter"
         value={value}
         placeholder={ui.stepper.textPlaceholder}
         onChange={(e) => onChange(e.target.value === "" ? undefined : e.target.value)}
@@ -264,7 +268,7 @@ export function SendStep({
                 <button
                   type="button"
                   onClick={() => onJump(q.id)}
-                  className="flex min-h-11 w-full items-center gap-3 rounded-[4px] border border-line px-4 py-2 text-left text-[0.9375rem] text-sand transition-colors hover:border-gold"
+                  className="flex min-h-11 w-full touch-manipulation items-center gap-3 rounded-[4px] border border-line px-4 py-2 text-left text-[0.9375rem] text-sand transition-colors hover:border-gold"
                 >
                   <span className="flex-none font-semibold text-gold-light">{t.goTo(q.number)}</span>
                   <span className="min-w-0 truncate text-muted">{q.prompt}</span>
@@ -298,9 +302,13 @@ export function SendStep({
         </label>
       </div>
 
-      <div aria-live="polite">
+      {/* Persistent live regions: the status is spoken while sending, the alert when it fails. */}
+      <p role="status" className="sr-only">
+        {sending ? t.sending : ""}
+      </p>
+      <div role="alert">
         {submit.status === "error" ? (
-          <div role="alert" className="field-error mx-auto mt-8 max-w-[34rem] text-left">
+          <div className="field-error mx-auto mt-8 max-w-[34rem] text-left">
             <span aria-hidden="true" className="mt-[0.2rem] text-gold-light">
               ◆
             </span>
@@ -314,11 +322,14 @@ export function SendStep({
           <ArrowLeft />
           {ui.stepper.back}
         </button>
+        {/* aria-disabled (not disabled) while sending keeps keyboard focus on the button,
+            so Enter can retry after an error; onSend ignores presses while a send is in flight. */}
         <button
           type="button"
-          className="btn-gold min-w-[15rem]"
+          className="btn-gold min-w-[min(15rem,100%)]"
           onClick={onSend}
-          disabled={sending || missing.length > 0}
+          disabled={missing.length > 0}
+          aria-disabled={sending || undefined}
           aria-busy={sending || undefined}
         >
           {sending ? t.sending : submit.status === "error" ? t.tryAgain : t.submit}
