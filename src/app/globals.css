@@ -124,13 +124,17 @@
       box-shadow 160ms var(--ease-soft),
       filter 160ms var(--ease-soft);
     cursor: pointer;
+    touch-action: manipulation;
   }
-  .btn-gold:hover {
-    filter: brightness(1.06);
-    box-shadow:
-      0 0 0 1px color-mix(in srgb, var(--color-night) 40%, transparent),
-      0 8px 36px -4px color-mix(in srgb, var(--color-gold) 70%, transparent),
-      inset 0 1px 0 color-mix(in srgb, var(--color-sand) 60%, transparent);
+  /* Hover only where a pointer can hover, so it never sticks after a tap. */
+  @media (hover: hover) {
+    .btn-gold:hover {
+      filter: brightness(1.06);
+      box-shadow:
+        0 0 0 1px color-mix(in srgb, var(--color-night) 40%, transparent),
+        0 8px 36px -4px color-mix(in srgb, var(--color-gold) 70%, transparent),
+        inset 0 1px 0 color-mix(in srgb, var(--color-sand) 60%, transparent);
+    }
   }
   .btn-gold:active {
     transform: translateY(1px);
@@ -139,6 +143,9 @@
   .btn-gold[aria-disabled="true"] {
     cursor: progress;
     filter: saturate(0.6) brightness(0.9);
+  }
+  .btn-gold:disabled {
+    cursor: not-allowed;
   }
 
   /* Outlined pill (Back) */
@@ -159,10 +166,13 @@
       border-color 160ms var(--ease-soft),
       background-color 160ms var(--ease-soft);
     cursor: pointer;
+    touch-action: manipulation;
   }
-  .btn-ghost:hover {
-    border-color: var(--color-gold);
-    background-color: color-mix(in srgb, var(--color-gold) 8%, transparent);
+  @media (hover: hover) {
+    .btn-ghost:hover {
+      border-color: var(--color-gold);
+      background-color: color-mix(in srgb, var(--color-gold) 8%, transparent);
+    }
   }
 
   /* ---------- hero ---------- */
@@ -391,13 +401,16 @@
     font-size: 1.0625rem;
     line-height: 1.35;
     cursor: pointer;
+    touch-action: manipulation;
     transition:
       border-color 160ms var(--ease-soft),
       background-color 160ms var(--ease-soft),
       box-shadow 160ms var(--ease-soft);
   }
-  .opt-row:hover {
-    border-color: color-mix(in srgb, var(--color-gold) 60%, var(--color-line));
+  @media (hover: hover) {
+    .opt-row:hover {
+      border-color: color-mix(in srgb, var(--color-gold) 60%, var(--color-line));
+    }
   }
   .opt-row[data-selected="true"] {
     border-color: var(--color-gold-pale);
@@ -427,12 +440,15 @@
     background: var(--color-night-deep);
     color: var(--color-sand);
     cursor: pointer;
+    touch-action: manipulation;
     transition:
       border-color 160ms var(--ease-soft),
       box-shadow 160ms var(--ease-soft);
   }
-  .opt-card:hover {
-    border-color: color-mix(in srgb, var(--color-gold) 60%, var(--color-line));
+  @media (hover: hover) {
+    .opt-card:hover {
+      border-color: color-mix(in srgb, var(--color-gold) 60%, var(--color-line));
+    }
   }
   .opt-card-label {
     display: flex;
