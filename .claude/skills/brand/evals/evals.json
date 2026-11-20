@@ -1,0 +1,32 @@
+[
+  {
+    "skills": ["brand"],
+    "query": "Review this event-marketplace copy for voice, terminology, and consistency with the Monasabati brand direction.",
+    "files": ["docs/80-decisions/83-adr-003-brand-refresh.md"],
+    "expected_behavior": [
+      "Reads the approved brand direction before making recommendations",
+      "Reports concrete terminology or tone issues with file references",
+      "Does not invent colors, claims, or brand rules"
+    ]
+  },
+  {
+    "skills": ["brand"],
+    "query": "Validate a new logo asset for naming, format, dimensions, and brand compliance.",
+    "files": ["apps/dashboard/public/brand"],
+    "expected_behavior": [
+      "Runs the bundled asset validator when applicable",
+      "Reports each failed check explicitly",
+      "Provides a clear pass or fail result"
+    ]
+  },
+  {
+    "skills": ["brand"],
+    "query": "Update a brand token and verify the generated shared design-token output.",
+    "files": ["packages/shared/design/tokens.json"],
+    "expected_behavior": [
+      "Treats tokens.json as the source of truth",
+      "Does not edit generated token files manually",
+      "Runs the repository token generation or validation command before reporting success"
+    ]
+  }
+]

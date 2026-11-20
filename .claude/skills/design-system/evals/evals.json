@@ -1,0 +1,32 @@
+[
+  {
+    "skills": ["design-system"],
+    "query": "Add a semantic token for a new surface state without introducing a raw value in components.",
+    "files": ["packages/shared/design/tokens.json"],
+    "expected_behavior": [
+      "Checks the primitive, semantic, and component token layers",
+      "Uses the existing repository token naming conventions",
+      "Validates generated outputs after the change"
+    ]
+  },
+  {
+    "skills": ["design-system"],
+    "query": "Review this component for hard-coded colors, typography, spacing, and incorrect state definitions.",
+    "files": ["apps/dashboard/src/components"],
+    "expected_behavior": [
+      "Uses the repository semantic tokens as the comparison baseline",
+      "Checks default, hover, active, disabled, and focus states",
+      "Reports exact files and actionable corrections"
+    ]
+  },
+  {
+    "skills": ["design-system"],
+    "query": "Create a token-compliant presentation slide and verify its generated HTML.",
+    "files": ["packages/shared/design"],
+    "expected_behavior": [
+      "Uses the target project's generated token output",
+      "Runs the slide token validator",
+      "Does not report success when validation fails"
+    ]
+  }
+]

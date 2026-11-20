@@ -1,0 +1,32 @@
+[
+  {
+    "skills": ["minimalist-ui"],
+    "query": "Design a premium, restrained dashboard using the repository's semantic tokens.",
+    "files": ["packages/shared/design/tokens.json"],
+    "expected_behavior": [
+      "Uses semantic tokens instead of hard-coded colors",
+      "Applies editorial hierarchy without generic SaaS card repetition",
+      "Explains any deliberate deviation from the minimalist constraints"
+    ]
+  },
+  {
+    "skills": ["minimalist-ui"],
+    "query": "Review this interface for contradictions in the minimalist rules.",
+    "files": ["apps/dashboard/src"],
+    "expected_behavior": [
+      "Detects conflicting rules such as banning and later permitting gradients",
+      "Checks accessibility and motion preferences",
+      "Recommends the smallest coherent corrections"
+    ]
+  },
+  {
+    "skills": ["minimalist-ui"],
+    "query": "Create a responsive editorial component with realistic local content.",
+    "files": ["apps/dashboard/src/components"],
+    "expected_behavior": [
+      "Avoids placeholder clichés and invented brand claims",
+      "Keeps the layout usable on narrow screens",
+      "Uses project typography and token conventions"
+    ]
+  }
+]

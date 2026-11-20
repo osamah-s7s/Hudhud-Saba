@@ -1,0 +1,29 @@
+[
+  {
+    "skills": ["playwright-cli"],
+    "query": "Open the dashboard, verify the login form, submit invalid data, and report the visible error.",
+    "expected_behavior": [
+      "Captures a snapshot before interacting",
+      "Verifies the error state rather than only clicking the button",
+      "Closes the browser session and reports the exact failed step if blocked"
+    ]
+  },
+  {
+    "skills": ["playwright-cli"],
+    "query": "Run a stateful browser flow that saves authentication state for a later test.",
+    "expected_behavior": [
+      "Reads the session-management and storage-state references",
+      "Saves state only after verifying the authenticated page",
+      "Does not commit temporary browser artifacts"
+    ]
+  },
+  {
+    "skills": ["playwright-cli"],
+    "query": "Capture a before-and-after screenshot for a UI fix and attach only useful evidence to a pull request.",
+    "expected_behavior": [
+      "Uses a stable artifacts directory",
+      "Includes meaningful alt text for images",
+      "Avoids attaching unrelated or missing files"
+    ]
+  }
+]

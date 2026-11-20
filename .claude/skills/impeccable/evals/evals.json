@@ -1,0 +1,32 @@
+[
+  {
+    "skills": ["impeccable"],
+    "query": "Shape a new dashboard surface from the existing product context before writing UI code.",
+    "files": ["apps/dashboard/src", "docs/20-product/21-project-scope.md"],
+    "expected_behavior": [
+      "Loads project context and the applicable command reference",
+      "Chooses the correct Persuade, Operate, Read, or Experience mode",
+      "Produces a bounded plan before editing"
+    ]
+  },
+  {
+    "skills": ["impeccable"],
+    "query": "Critique this page and report the highest-priority UX and visual issues.",
+    "files": ["apps/dashboard/src/app"],
+    "expected_behavior": [
+      "Uses the critique workflow and required evidence sources",
+      "Separates observed findings from recommendations",
+      "Ends with the command's required question or explicit skipped-questions reason"
+    ]
+  },
+  {
+    "skills": ["impeccable"],
+    "query": "Polish this UI for responsive behavior, accessibility, reduced motion, and production readiness.",
+    "files": ["apps/dashboard/src"],
+    "expected_behavior": [
+      "Reads the craft-floor guidance before editing",
+      "Uses a bounded inspect-fix-confirm loop",
+      "Runs the smallest relevant verification before reporting completion"
+    ]
+  }
+]

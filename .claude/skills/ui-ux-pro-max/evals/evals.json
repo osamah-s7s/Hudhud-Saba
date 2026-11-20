@@ -1,0 +1,32 @@
+[
+  {
+    "skills": ["ui-ux-pro-max"],
+    "query": "Create a design system for a Sana'a event-services marketplace mobile experience.",
+    "files": ["docs/20-product/21-project-scope.md", "packages/shared/design/tokens.json"],
+    "expected_behavior": [
+      "Detects the React Native stack instead of assuming a web stack",
+      "Runs a design-system search with a focused query",
+      "Separates verified search results from fallback guidance"
+    ]
+  },
+  {
+    "skills": ["ui-ux-pro-max"],
+    "query": "Fix an accessible form error state without relying on color alone.",
+    "files": ["apps/dashboard/src"],
+    "expected_behavior": [
+      "Searches for the semantic UX outcome before stack details",
+      "Checks labels, focus, error proximity, and announcement behavior",
+      "Verifies the implementation against the selected guidance"
+    ]
+  },
+  {
+    "skills": ["ui-ux-pro-max"],
+    "query": "Review a responsive dashboard chart and improve its usability.",
+    "files": ["apps/dashboard/src"],
+    "expected_behavior": [
+      "Checks responsive layout and horizontal overflow",
+      "Checks chart legends, tooltips, and non-color meaning",
+      "Uses the repository token and typography conventions"
+    ]
+  }
+]

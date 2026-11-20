@@ -1,0 +1,30 @@
+[
+  {
+    "skills": ["shadcn"],
+    "query": "Add an existing shadcn component to the dashboard and preserve the project's configured base or radix implementation.",
+    "expected_behavior": [
+      "Reads the current project configuration before choosing a command",
+      "Searches existing components before creating custom markup",
+      "Uses the project's package runner and validates the result"
+    ]
+  },
+  {
+    "skills": ["shadcn"],
+    "query": "Review a form for Field, validation, and semantic-token compliance.",
+    "files": ["apps/dashboard/src/components"],
+    "expected_behavior": [
+      "Reads the forms and styling rule references",
+      "Checks data-invalid and aria-invalid placement",
+      "Reports exact corrections without rewriting unrelated code"
+    ]
+  },
+  {
+    "skills": ["shadcn"],
+    "query": "Apply a preset code to an existing project.",
+    "expected_behavior": [
+      "Uses the CLI preset command rather than decoding or constructing URLs manually",
+      "Checks the working tree before applying changes",
+      "Reports the command result and any generated files"
+    ]
+  }
+]

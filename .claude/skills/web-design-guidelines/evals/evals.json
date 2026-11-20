@@ -1,0 +1,30 @@
+[
+  {
+    "skills": ["web-design-guidelines"],
+    "query": "Review the dashboard page for Web Interface Guidelines compliance.",
+    "files": ["apps/dashboard/src/app"],
+    "expected_behavior": [
+      "Fetches the current guideline source before reviewing",
+      "Reads the requested files rather than guessing from filenames",
+      "Uses the guideline-required terse file:line output format"
+    ]
+  },
+  {
+    "skills": ["web-design-guidelines"],
+    "query": "Review an accessible form and report only actionable findings.",
+    "files": ["apps/dashboard/src/components"],
+    "expected_behavior": [
+      "Checks keyboard, labels, focus, and error behavior",
+      "Avoids reporting issues not supported by the fetched rules",
+      "Includes exact file and line locations"
+    ]
+  },
+  {
+    "skills": ["web-design-guidelines"],
+    "query": "No file pattern was provided. Explain the next required input.",
+    "expected_behavior": [
+      "Asks for a file or pattern to review",
+      "Does not fabricate a target or produce unsupported findings"
+    ]
+  }
+]

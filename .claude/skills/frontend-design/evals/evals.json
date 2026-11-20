@@ -1,0 +1,32 @@
+[
+  {
+    "skills": ["frontend-design"],
+    "query": "Design a distinctive landing page for a Sana'a event-services marketplace from this product brief.",
+    "files": ["docs/20-product/21-project-scope.md"],
+    "expected_behavior": [
+      "Extracts the subject, audience, and primary job from the brief",
+      "Proposes a compact color, typography, layout, and principle system before coding",
+      "Checks the proposal for generic defaults before implementation"
+    ]
+  },
+  {
+    "skills": ["frontend-design"],
+    "query": "Review this new page for generic visual patterns and propose targeted improvements.",
+    "files": ["apps/dashboard/src/app"],
+    "expected_behavior": [
+      "Identifies generic choices with concrete evidence",
+      "Preserves project constraints and existing content",
+      "Provides a prioritized revision plan rather than unrelated redesign"
+    ]
+  },
+  {
+    "skills": ["frontend-design"],
+    "query": "Polish this interface for mobile, keyboard focus, reduced motion, and readable content.",
+    "files": ["apps/dashboard/src"],
+    "expected_behavior": [
+      "Checks responsive behavior and visible focus",
+      "Checks reduced-motion behavior",
+      "Validates the result with an available browser or test workflow"
+    ]
+  }
+]

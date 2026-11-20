@@ -1,0 +1,32 @@
+[
+  {
+    "skills": ["vercel-react-best-practices"],
+    "query": "Review this server component for sequential data-fetching waterfalls.",
+    "files": ["apps/dashboard/src"],
+    "expected_behavior": [
+      "Selects the relevant async and server rules",
+      "Distinguishes dependent requests from independent requests",
+      "Provides a safe refactor with preserved behavior"
+    ]
+  },
+  {
+    "skills": ["vercel-react-best-practices"],
+    "query": "Review this page for bundle-size and client-boundary problems.",
+    "files": ["apps/dashboard/src"],
+    "expected_behavior": [
+      "Checks direct imports, dynamic imports, and third-party loading",
+      "Avoids recommending optimization without evidence",
+      "Reports the highest-impact findings first"
+    ]
+  },
+  {
+    "skills": ["vercel-react-best-practices"],
+    "query": "Review this component for unnecessary renders and effect-driven derived state.",
+    "files": ["apps/dashboard/src/components"],
+    "expected_behavior": [
+      "Uses the relevant rerender rule files",
+      "Separates correctness issues from optional optimization",
+      "Suggests measurable verification where possible"
+    ]
+  }
+]
