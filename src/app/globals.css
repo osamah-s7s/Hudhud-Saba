@@ -1,26 +1,582 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * "Night Majlis" — seven fixed colours, plus tints and shades of them only.
+ * Everything else below is mixed from these with color-mix().
+ */
+@theme {
+  --color-sand: #e8d5b7;
+  --color-terracotta: #b96b45;
+  --color-earth: #713b2e;
+  --color-burgundy: #762f35;
+  --color-gold: #b58a45;
+  --color-charcoal: #34302c;
+  --color-olive: #68734b;
+
+  /* Derived tints / shades */
+  --color-night: #1d1a18; /* page background: a shade of charcoal */
+  --color-night-deep: #151210;
+  --color-panel: #2a2623; /* raised card: charcoal, darkened */
+  --color-gold-light: #d2ad6c; /* gold tinted toward sand */
+  --color-gold-pale: #e2c690;
+  --color-muted: #b6a690; /* sand, darkened: 7:1 on night */
+  --color-subtle: #9c8e7b; /* sand, darker: 5.3:1 on night */
+  --color-line: #4a4038; /* hairlines (decorative) */
+  --color-edge: #7a6a55; /* UI boundaries: 3.3:1 on night */
+
+  --font-sans: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-cormorant), ui-serif, Georgia, serif;
+  --font-arabic: var(--font-amiri), "Noto Naskh Arabic", serif;
+
+  --ease-soft: cubic-bezier(0.22, 0.8, 0.3, 1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer base {
+  html {
+    color-scheme: dark;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  body {
+    background-color: var(--color-night);
+    color: var(--color-sand);
+    font-family: var(--font-sans);
+    overflow-x: clip;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-gold) 55%, transparent);
+    color: var(--color-sand);
+  }
+
+  /* One visible focus style for everything: sand ring, well above 3:1 on night and gold. */
+  :focus-visible {
+    outline: 2px solid var(--color-sand);
+    outline-offset: 3px;
+  }
+
+  [tabindex="-1"]:focus {
+    outline: none;
+  }
+
+  kbd {
+    font-family: var(--font-sans);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /* ---------- small shared pieces ---------- */
+
+  .kicker {
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.38em;
+    text-transform: uppercase;
+    color: var(--color-gold-light);
+  }
+
+  .kbd-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.35rem;
+    height: 1.25rem;
+    padding: 0 0.3rem;
+    margin: 0 0.15rem;
+    border: 1px solid color-mix(in srgb, var(--color-gold) 70%, transparent);
+    border-radius: 3px;
+    font-size: 0.6875rem;
+    line-height: 1;
+    color: var(--color-gold-pale);
+    vertical-align: 0.1em;
+  }
+
+  /* Gold pill (Begin / Next / Continue / Send) */
+  .btn-gold {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    min-height: 3.375rem;
+    padding: 0 1.75rem;
+    border-radius: 9999px;
+    border: 1px solid color-mix(in srgb, var(--color-gold-pale) 70%, var(--color-gold));
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-gold) 55%, var(--color-sand)) 0%,
+      var(--color-gold) 100%
+    );
+    color: var(--color-night);
+    font-weight: 700;
+    font-size: 1.0625rem;
+    letter-spacing: 0.02em;
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--color-night) 40%, transparent),
+      0 6px 28px -4px color-mix(in srgb, var(--color-gold) 55%, transparent),
+      inset 0 1px 0 color-mix(in srgb, var(--color-sand) 60%, transparent);
+    transition:
+      transform 160ms var(--ease-soft),
+      box-shadow 160ms var(--ease-soft),
+      filter 160ms var(--ease-soft);
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  /* Hover only where a pointer can hover, so it never sticks after a tap. */
+  @media (hover: hover) {
+    .btn-gold:hover {
+      filter: brightness(1.06);
+      box-shadow:
+        0 0 0 1px color-mix(in srgb, var(--color-night) 40%, transparent),
+        0 8px 36px -4px color-mix(in srgb, var(--color-gold) 70%, transparent),
+        inset 0 1px 0 color-mix(in srgb, var(--color-sand) 60%, transparent);
+    }
+  }
+  .btn-gold:active {
+    transform: translateY(1px);
+  }
+  .btn-gold:disabled,
+  .btn-gold[aria-disabled="true"] {
+    cursor: progress;
+    filter: saturate(0.6) brightness(0.9);
+  }
+  .btn-gold:disabled {
+    cursor: not-allowed;
+  }
+
+  /* Outlined pill (Back) */
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    min-height: 2.875rem;
+    min-width: 2.875rem;
+    padding: 0 1.25rem;
+    border-radius: 9999px;
+    border: 1px solid var(--color-edge);
+    color: var(--color-sand);
+    font-weight: 600;
+    font-size: 1.0625rem;
+    transition:
+      border-color 160ms var(--ease-soft),
+      background-color 160ms var(--ease-soft);
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  @media (hover: hover) {
+    .btn-ghost:hover {
+      border-color: var(--color-gold);
+      background-color: color-mix(in srgb, var(--color-gold) 8%, transparent);
+    }
+  }
+
+  /* ---------- hero ---------- */
+
+  .hero-frame {
+    position: relative;
+    aspect-ratio: 1440 / 740;
+    /* Phones: wider than the viewport, cropped so all four pins stay in view. */
+    width: 118.5%;
+    margin-left: -12.3%;
+  }
+  @media (min-width: 768px) {
+    .hero-frame {
+      width: 100%;
+      margin-left: 0;
+    }
+  }
+  .hero-fade {
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--color-night) 0%, transparent) 55%,
+        color-mix(in srgb, var(--color-night) 60%, transparent) 82%,
+        var(--color-night) 100%
+      ),
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--color-night) 25%, transparent) 0%,
+        transparent 14%
+      );
+  }
+
+  .pin-label {
+    display: inline-flex;
+    align-items: center;
+    height: 1.125rem;
+    padding: 0 0.5rem;
+    border-radius: 9999px;
+    background: color-mix(in srgb, var(--color-night) 88%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-gold) 30%, transparent);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--color-night-deep) 60%, transparent);
+    color: var(--color-sand);
+    font-size: 0.5625rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  @media (min-width: 768px) {
+    .pin-label {
+      height: 1.25rem;
+      padding: 0 0.6rem;
+      font-size: 0.625rem;
+    }
+  }
+
+  .title-glow {
+    text-shadow:
+      0 0 18px color-mix(in srgb, var(--color-sand) 30%, transparent),
+      0 0 54px color-mix(in srgb, var(--color-gold) 30%, transparent);
+  }
+
+  /* ---------- ticket ---------- */
+
+  .ticket {
+    position: relative;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-charcoal) 82%, var(--color-night)) 0%,
+      color-mix(in srgb, var(--color-charcoal) 62%, var(--color-night)) 100%
+    );
+    border: 1px solid color-mix(in srgb, var(--color-gold) 38%, transparent);
+    border-radius: 6px;
+    box-shadow: 0 18px 40px -18px var(--color-night-deep);
+  }
+  .ticket::before,
+  .ticket::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 12px;
+    height: 12px;
+    margin-top: -6px;
+    border-radius: 9999px;
+    background: var(--color-night);
+    border: 1px solid color-mix(in srgb, var(--color-gold) 38%, transparent);
+  }
+  .ticket::before {
+    left: -7px;
+    clip-path: inset(0 0 0 50%);
+  }
+  .ticket::after {
+    right: -7px;
+    clip-path: inset(0 50% 0 0);
+  }
+
+  /* ---------- ornament ---------- */
+
+  .ornament-line {
+    height: 1px;
+    width: clamp(3.5rem, 12vw, 6.5rem);
+    background: linear-gradient(90deg, transparent, var(--color-gold));
+  }
+  .ornament-line.is-right {
+    background: linear-gradient(90deg, var(--color-gold), transparent);
+  }
+
+  /* ---------- qamariya ---------- */
+
+  .niche {
+    position: relative;
+    width: min(33rem, 100%);
+    margin-inline: auto;
+    aspect-ratio: 530 / 360;
+    border-radius: 9999px 9999px 0 0;
+    background:
+      radial-gradient(
+        ellipse 70% 60% at 50% 70%,
+        color-mix(in srgb, var(--color-earth) 22%, var(--color-night-deep)) 0%,
+        transparent 70%
+      ),
+      linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--color-night-deep) 92%, black) 0%,
+        var(--color-night-deep) 55%,
+        color-mix(in srgb, var(--color-burgundy) 22%, var(--color-night-deep)) 100%
+      );
+    box-shadow:
+      inset 0 2px 0 color-mix(in srgb, var(--color-gold) 26%, transparent),
+      inset 0 24px 50px -20px black,
+      0 -14px 60px -24px color-mix(in srgb, var(--color-gold) 40%, transparent);
+  }
+  .q-scene {
+    --turn: -18deg;
+  }
+  .q-stage {
+    perspective: 1100px;
+    perspective-origin: 50% 40%;
+  }
+  .q-turn {
+    transform-style: preserve-3d;
+    transform: rotateY(var(--turn));
+    will-change: transform;
+  }
+  .q-layer {
+    position: absolute;
+    inset: 0;
+  }
+  .q-floor {
+    transform-origin: 50% 0%;
+    transform: perspective(700px) rotateX(64deg) skewX(calc(var(--turn) * 1.25));
+    will-change: transform;
+  }
+  .q-floor-inner {
+    transform: scaleY(-1);
+    filter: blur(6px);
+    opacity: 0.9;
+  }
+
+  /* ---------- questionnaire overview ---------- */
+
+  .begin-halo::before {
+    content: "";
+    position: absolute;
+    inset: -60% -12%;
+    z-index: -1;
+    border-radius: 9999px;
+    background: radial-gradient(
+      closest-side,
+      color-mix(in srgb, var(--color-gold) 22%, transparent),
+      transparent
+    );
+    pointer-events: none;
+  }
+
+  .kbd-hint {
+    display: none;
+  }
+  @media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+    .kbd-hint {
+      display: block;
+    }
+    .kbd-inline {
+      display: inline-flex;
+    }
+  }
+
+  /* ---------- stepper ---------- */
+
+  .stepper-glow {
+    background:
+      radial-gradient(
+        ellipse 55% 42% at 50% 16%,
+        color-mix(in srgb, var(--color-gold) 17%, transparent),
+        transparent 72%
+      ),
+      radial-gradient(
+        ellipse 60% 60% at 50% 40%,
+        color-mix(in srgb, var(--color-earth) 14%, transparent),
+        transparent 80%
+      );
+  }
+
+  .outline-numeral {
+    color: transparent;
+    -webkit-text-stroke: 1px color-mix(in srgb, var(--color-gold) 85%, transparent);
+  }
+
+  /* Answer rows (list options) */
+  .opt-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+    min-height: 3.4375rem;
+    padding: 0.75rem 1.1rem;
+    border: 1px solid var(--color-line);
+    border-radius: 4px;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-charcoal) 70%, var(--color-night)) 0%,
+      color-mix(in srgb, var(--color-night) 85%, var(--color-night-deep)) 100%
+    );
+    color: var(--color-sand);
+    font-weight: 500;
+    font-size: 1.0625rem;
+    line-height: 1.35;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition:
+      border-color 160ms var(--ease-soft),
+      background-color 160ms var(--ease-soft),
+      box-shadow 160ms var(--ease-soft);
+  }
+  @media (hover: hover) {
+    .opt-row:hover {
+      border-color: color-mix(in srgb, var(--color-gold) 60%, var(--color-line));
+    }
+  }
+  .opt-row[data-selected="true"] {
+    border-color: var(--color-gold-pale);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-gold) 60%, var(--color-sand)) 0%,
+      var(--color-gold) 100%
+    );
+    color: var(--color-night);
+    font-weight: 600;
+    box-shadow: 0 4px 26px -6px color-mix(in srgb, var(--color-gold) 65%, transparent);
+  }
+  .opt-row:has(input:focus-visible),
+  .opt-card:has(input:focus-visible) {
+    outline: 2px solid var(--color-sand);
+    outline-offset: 3px;
+  }
+
+  /* Picture cards */
+  .opt-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--color-line);
+    border-radius: 5px;
+    background: var(--color-night-deep);
+    color: var(--color-sand);
+    cursor: pointer;
+    touch-action: manipulation;
+    transition:
+      border-color 160ms var(--ease-soft),
+      box-shadow 160ms var(--ease-soft);
+  }
+  @media (hover: hover) {
+    .opt-card:hover {
+      border-color: color-mix(in srgb, var(--color-gold) 60%, var(--color-line));
+    }
+  }
+  .opt-card-label {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.8rem 0.75rem 0.8rem 1rem;
+    font-weight: 500;
+    font-size: 0.90625rem;
+    line-height: 1.35;
+    border-top: 1px solid var(--color-line);
+  }
+  .opt-card[data-selected="true"] {
+    border-color: var(--color-gold-pale);
+    box-shadow: 0 6px 30px -6px color-mix(in srgb, var(--color-gold) 70%, transparent);
+  }
+  .opt-card[data-selected="true"][data-kind="single"] {
+    box-shadow:
+      0 0 0 3px var(--color-night),
+      0 0 0 5px var(--color-gold-pale),
+      0 8px 34px -4px color-mix(in srgb, var(--color-gold) 70%, transparent);
+  }
+  /* The selection ring above sits 3–5px out; move the focus ring clear of it so focus stays visible. */
+  .opt-card[data-selected="true"][data-kind="single"]:has(input:focus-visible) {
+    outline-offset: 7px;
+  }
+  .opt-card[data-selected="true"] .opt-card-label {
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-gold) 60%, var(--color-sand)) 0%,
+      var(--color-gold) 100%
+    );
+    color: var(--color-night);
+    font-weight: 600;
+    border-top-color: var(--color-gold-pale);
+  }
+
+  .marker {
+    flex: none;
+    color: var(--color-gold-light);
+  }
+  [data-selected="true"] .marker {
+    color: var(--color-night);
+  }
+
+  .hint-pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.875rem;
+    padding: 0.2rem 0.75rem;
+    border: 1px solid color-mix(in srgb, var(--color-gold) 55%, transparent);
+    border-radius: 9999px;
+    color: var(--color-gold-pale);
+    font-size: 0.875rem;
+  }
+
+  .field-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid color-mix(in srgb, var(--color-terracotta) 75%, transparent);
+    border-left-width: 3px;
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--color-burgundy) 22%, var(--color-night));
+    color: var(--color-sand);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  .text-answer {
+    width: 100%;
+    min-height: 11rem;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--color-edge);
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--color-night-deep) 70%, var(--color-night));
+    color: var(--color-sand);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    resize: vertical;
+  }
+  .text-answer::placeholder {
+    color: var(--color-subtle);
+  }
+  .text-answer:focus-visible {
+    outline-offset: 2px;
+    border-color: var(--color-gold);
+  }
+
+  .step-enter {
+    animation: step-in 280ms var(--ease-soft) both;
+  }
+
+  .honeypot {
+    position: absolute;
+    left: -10000px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+}
+
+@keyframes step-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .q-turn {
+    transform: none !important;
+  }
+  .q-floor {
+    transform: perspective(700px) rotateX(64deg) !important;
+  }
 }
